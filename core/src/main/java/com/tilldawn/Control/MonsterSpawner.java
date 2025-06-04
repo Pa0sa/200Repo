@@ -1,6 +1,8 @@
 package com.tilldawn.Control;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,6 +13,8 @@ import com.tilldawn.Model.App;
 import com.tilldawn.Model.AssetManager;
 import com.tilldawn.Model.Monster.*;
 import com.tilldawn.View.GameView;
+
+import static com.tilldawn.Main.playMusic;
 
 public class MonsterSpawner {
     private Array<MonsterBullet> monsters = new Array<>();
@@ -34,12 +38,13 @@ public class MonsterSpawner {
     private int eyebatBulletpassedTime2 = 0;
     private float tentacleTimer = 0;
     private float eyebatTimer = 0;
+    private boolean spawnElder = false;
 
     public MonsterSpawner() {
         spawnTrees();
         //spawnTentacleMonster();
         //eyebats.add(new Eyebat(0, 0));
-        elderBoss = new ElderBoss(0 , 0);
+                //elderBoss = new ElderBoss(0 , 0);
     }
     public void updateXPs() {
         for(XP xp : xps) {
@@ -365,6 +370,9 @@ public class MonsterSpawner {
     }
 
     public void updateElder() {
+        if(elderBoss == null && App.getTimeOfChoice()/2 < App.getTimePassed()){
+            elderBoss = new ElderBoss(0 , 0);
+        }
         if(elderBoss != null) {
                 float playerX = App.getPlayerController().getPlayer().getPosX();
                 float playerY = App.getPlayerController().getPlayer().getPosY();
@@ -447,10 +455,26 @@ public class MonsterSpawner {
         }
     }
 
-    public void spawnElder(float delta){
-        if(App.getTimeOfChoice()/2 < App.getTimePassed()) {
-            elderBoss = new ElderBoss(0 , 0);
+    public static Music currentMusic;
+    public static void playSFX(String path) {
+        if (currentMusic != null) {
+            currentMusic.stop();
+            currentMusic.dispose();
+        }
+        currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
+        currentMusic.setLooping(true);
+        // Load saved volume
+        Preferences prefs = Gdx.app.getPreferences("Settings");
+        float volume = prefs.getFloat("sfxVolume", 0.5f);
+        currentMusic.setVolume(volume);
+        currentMusic.play();
+    }
 
+    private boolean playSfx = true;
+    public void spawnElder(float delta){;
+        if(App.getTimeOfChoice()/2 < App.getTimePassed() && playSfx) {
+            playSfx = false;
+            playSFX("SFX/bossfight.mp3");
         }
     }
 

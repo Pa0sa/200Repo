@@ -41,6 +41,9 @@ public class App {
         return users;
     }
 
+    private static boolean playSfx = true;
+    private static float sfxVolume = 0.5f;
+
     public static User getCurrentUser() {
         return currentUser;
     }
@@ -161,6 +164,22 @@ public class App {
 
     public static void setPlayerController(PlayerController playerController) {
         App.playerController = playerController;
+    }
+
+    public static boolean isPlaySfx() {
+        return playSfx;
+    }
+
+    public static void setPlaySfx(boolean playSfx) {
+        App.playSfx = playSfx;
+    }
+
+    public static float getSfxVolume() {
+        return sfxVolume;
+    }
+
+    public static void setSfxVolume(float sfxVolume) {
+        App.sfxVolume = sfxVolume;
     }
 
     public static WeaponController getWeaponController() {

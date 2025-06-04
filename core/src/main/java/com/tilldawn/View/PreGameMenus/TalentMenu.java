@@ -29,10 +29,11 @@ public class TalentMenu implements Screen {
     private Map<String, Integer> currentKeyBindings; // از تنظیمات خوانده شود
     private Map<String, String> cheats = Map.of(
         "O :", "Pass 1 minute",
-        "L :", "Level up",
+        "K :", "Level up",
         "I :","Adds Health",
         "P :","Goes to Boss Fight",
-        "K :", "Revives the Player after Death",
+        "M :", "Revives the Player after Death",
+        "N :", "Infinite Ammo",
         "Space :" , "Auto Aim"
     );
     private String[] abilities = {"Vitality : Adds 1 to Maximum Health", "Damager : Increase Damage by 25% for 10 seconds",

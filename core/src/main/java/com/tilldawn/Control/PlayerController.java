@@ -2,6 +2,8 @@ package com.tilldawn.Control;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.MathUtils;
@@ -86,7 +88,25 @@ public class PlayerController {
             reload = true;
         }
     }
+
+    public static Music currentMusic;
+    public static void playSFX(String path) {
+        if (currentMusic != null) {
+            currentMusic.stop();
+            currentMusic.dispose();
+        }
+        currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
+        currentMusic.setLooping(true);
+        // Load saved volume
+        Preferences prefs = Gdx.app.getPreferences("Settings");
+        float volume = prefs.getFloat("sfxVolume", 0.5f);
+        currentMusic.setVolume(volume);
+        currentMusic.play();
+        currentMusic.setLooping(false);
+    }
+
     public void reload(){
+        playSFX("SFX/reload.mp3");
         App.getWeaponOfChoice().setInGameSprite(AssetManager.getAssetManager().getSmgsSprite());
         reloadCounter += Gdx.graphics.getDeltaTime();
         if (reloadCounter >= App.getWeaponOfChoice().getReloadTime()) {

@@ -61,7 +61,8 @@ public class GameController {
             drawPlayerHealth();
 
             Main.getBatch().end();
-            drawProgressBar((float) (playerController.getPlayer().getXp() - (20 * (playerController.getPlayer().getLevel() - 1))) / (20 * playerController.getPlayer().getLevel()));
+            float f = (float) (playerController.getPlayer().getXp() - (20 * (playerController.getPlayer().getLevel() - 1))) / (20 * playerController.getPlayer().getLevel());
+            drawProgressBar(f);
             Main.getBatch().begin();
 
             if(!view.isPaused()) {
@@ -120,6 +121,7 @@ public class GameController {
         progress = MathUtils.clamp(progress, 0, 1);
         if(progress == 1){
             playerController.getPlayer().setLevel(playerController.getPlayer().getLevel() + 1);
+            view.setShowLevelUpWindow(true);
         }
 
         float barX = 500;
@@ -171,6 +173,14 @@ public class GameController {
             view.getLevelCount().setText("Level : " + String.valueOf(getPlayerController().getPlayer().getLevel()));
             App.setTimePassed(App.getTimeOfChoice() - remaining);
         }
+    }
+
+    public int getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(int remaining) {
+        this.remaining = remaining;
     }
 
     public void treeLogic() {

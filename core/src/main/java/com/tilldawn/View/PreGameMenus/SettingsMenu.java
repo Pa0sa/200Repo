@@ -73,7 +73,15 @@ public class SettingsMenu implements Screen {
         table.add(new Label("SFX Volume", skin)).left();
         sfxSlider = new Slider(0f, 1f, 0.01f, false, skin);
         sfxSlider.setValue(0.5f); // Default
-        // Add SFX test if needed
+        sfxSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                float volume = sfxSlider.getValue();
+                App.setSfxVolume(volume);
+                prefs.putFloat("sfxVolume", volume); // Correct key name
+                prefs.flush();
+            }
+        });
         table.add(sfxSlider).width(200).row();
 
         // Background Music Selection
