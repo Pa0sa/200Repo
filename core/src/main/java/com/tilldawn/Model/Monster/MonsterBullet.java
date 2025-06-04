@@ -30,7 +30,7 @@ public class MonsterBullet {
 
         // Set position first
         tentacle.setPosition(posX, posY);
-        tentacle.setSize(tentacle.getWidth()*3, tentacle.getHeight()*3);
+        tentacle.setSize(tentacle.getWidth()*2, tentacle.getHeight()*2);
 
 
         // Update collision rect to match scaled dimensions

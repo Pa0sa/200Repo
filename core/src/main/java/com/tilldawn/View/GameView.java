@@ -5,18 +5,32 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tilldawn.Control.GameController;
 import com.tilldawn.Main;
+import com.tilldawn.Model.Ability;
 import com.tilldawn.Model.App;
 import com.tilldawn.Model.AssetManager;
 import com.tilldawn.View.Components.FontUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class GameView implements Screen, InputProcessor {
     private Stage stage;
@@ -30,16 +44,25 @@ public class GameView implements Screen, InputProcessor {
     private boolean isPaused = false;
     private Window pauseWindow;
 
+    private InputProcessor previousGameInput;
+
     float reloadCounter = 0;
+    float speedyTimer = 0;
+    float damagerTimer = 0;
+    boolean countSpeedy = false;
+    boolean countDamager = false;
+
 
     private Label timeRemaining;
     private Label remainingAmmo;
     private Label killCount;
+    private Label levelCount;
 
 
     public GameView(GameController controller, Skin skin) {
         this.controller = controller;
         controller.setView(this);
+
     }
 
     @Override
@@ -51,21 +74,33 @@ public class GameView implements Screen, InputProcessor {
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
 
+
         Main.getBatch().begin();
         inputHandler();
-        if (!isPaused) {
-            controller.updateGame();
-            drawPlayerHealth();
+        controller.updateGame();
+        Main.getBatch().end();
+
+
+        if (showAbilityMenu && abilityStage != null) {
+            abilityStage.act(Gdx.graphics.getDeltaTime());
+            abilityStage.draw();
+            return; // Skip rest of game rendering
         }
 
-        Main.getBatch().end();
+        if(countSpeedy){
+            speedyTimer();
+        }
+        if(countDamager){
+            damagerTimer();
+        }
 
         // Set shader and draw UI
         Batch batch = stage.getBatch();
         batch.setShader(Main.isGrayscale() ? Main.getGrayscaleShader() : null);
         stage.act(delta);
         stage.draw();
-        batch.setShader(null);
+
+
     }
 
     @Override
@@ -160,6 +195,14 @@ public class GameView implements Screen, InputProcessor {
         return killCount;
     }
 
+    public Label getLevelCount() {
+        return levelCount;
+    }
+
+    public void setLevelCount(Label levelCount) {
+        this.levelCount = levelCount;
+    }
+
     public void setKillCount(Label killCount) {
         this.killCount = killCount;
     }
@@ -168,27 +211,99 @@ public class GameView implements Screen, InputProcessor {
         this.remainingAmmo = remainingAmmo;
     }
 
-    private void drawPlayerHealth() {
-        int maxHearts = App.getPlayerController().getPlayer().getHealth();
-        int currentHealth = App.getPlayerController().getPlayer().getHealth() - App.getPlayerController().getPlayer().getDamage();
 
 
-        Texture fullHeart = new Texture("heart_full.png");
-        Texture emptyHeart = new Texture("heart_empty.png"); // optional
+    private boolean showAbilityMenu = false;
+    private Stage abilityStage;
 
-        for (int i = 0; i < maxHearts; i++) {
-            float x = 20 + i * 40; // 40px spacing
-            float y = Gdx.graphics.getHeight() - 50;
+    public void showAbilitySelection() {
+        isPaused = true;
+        showAbilityMenu = true;
+        abilityStage = new Stage();
+        Gdx.input.setInputProcessor(abilityStage);
+        Skin skin = AssetManager.getAssetManager().getSkin();
+        Table table = new Table();
+        table.setFillParent(true);
+        table.center();
+        // Replace this with your own method
+        List<Ability> abilities = pickRandomAbilities(3);
+        for (Ability ability : abilities) {
+            TextButton btn = new TextButton(ability.getName() + "\n" + ability.getDescription(), skin);
+            btn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    applyAbility(ability);  // Your logic to apply the ability
+                    showAbilityMenu = false;
+                    abilityStage.dispose();
+                    isPaused = false;
+                    Gdx.input.setInputProcessor(previousGameInput); // restore your game input
+                }
+            });
+            table.add(btn).width(300).height(100).pad(20);
+            table.row();
+        }
+        abilityStage.addActor(table);
+    }
+    private final List<Ability> allAbilities = Arrays.asList(
+        new Ability("Vitality", "Increase max Health by 1"),
+        new Ability("Damager", " 10 seconds 25% Damage Increase"),
+        new Ability("ProCrease", "Increase weapon Projectile by 1 "),
+        new Ability("AmmoCrease", "Increase max Ammo by 5"),
+        new Ability("Speedy", "Doubles Speed for 10 seconds")
+    );
 
-            if (i < currentHealth) {
-                Main.getBatch().draw(fullHeart, x, y, 32, 32);
-            } else {
-                Main.getBatch().draw(emptyHeart, x, y, 32, 32);
-            }
+    private List<Ability> pickRandomAbilities(int count) {
+        List<Ability> shuffled = new ArrayList<>(allAbilities);
+        Collections.shuffle(shuffled);
+        return shuffled.subList(0, count);
+    }
+    private void applyAbility(Ability ability) {
+        switch (ability.getName()) {
+            case "Vitality":
+                controller.getPlayerController().getPlayer().addAbility(allAbilities.get(0));
+                controller.getPlayerController().getPlayer().setHealth(controller.getPlayerController().getPlayer().getHealth() + 1);
+                break;
+            case "Damager":
+                controller.getPlayerController().getPlayer().addAbility(allAbilities.get(1));
+                controller.getWeaponController().getWeapon().setDamage(controller.getWeaponController().getWeapon().getDamage() + (controller.getWeaponController().getWeapon().getDamage()/4));
+                break;
+            case "ProCrease":
+                controller.getPlayerController().getPlayer().addAbility(allAbilities.get(2));
+                break;
+            case "AmmoCrease":
+                controller.getPlayerController().getPlayer().addAbility(allAbilities.get(3));
+                controller.getWeaponController().getWeapon().setAmmo(controller.getWeaponController().getWeapon().getAmmo() + 5);
+                break;
+            case "Speedy":
+                controller.getPlayerController().getPlayer().addAbility(allAbilities.get(4));
+                controller.getPlayerController().getPlayer().setSpeed(controller.getPlayerController().getPlayer().getSpeed() *2);
+                countSpeedy = true;
+                break;
+        }
+    }
+
+    private void speedyTimer() {
+        speedyTimer += Gdx.graphics.getDeltaTime();
+        if(speedyTimer > 10) {
+            speedyTimer = 0;
+            controller.getPlayerController().getPlayer().setSpeed(controller.getPlayerController().getPlayer().getSpeed() /2);
+            countSpeedy = false;
+        }
+    }
+    private void damagerTimer() {
+        damagerTimer += Gdx.graphics.getDeltaTime();
+        if(speedyTimer > 10) {
+            damagerTimer = 0;
+            controller.getWeaponController().getWeapon().setDamage(controller.getWeaponController().getWeapon().getDamage() - (controller.getWeaponController().getWeapon().getDamage()/5));
+            countDamager = false;
         }
     }
 
     public void inputHandler(){
+        if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
+            previousGameInput = Gdx.input.getInputProcessor();
+            showAbilitySelection();
+        }
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             isPaused = !isPaused;
             pauseWindow.setVisible(isPaused);
@@ -205,7 +320,11 @@ public class GameView implements Screen, InputProcessor {
         } else if(cheatButton.isPressed()){
             //todo Show cheat code dialog or label
         } else if (abilitiesButton.isPressed()){
-            //todo Show abilities
+            //todo Show Ability dialog or label
+            for (Ability ability : controller.getPlayerController().getPlayer().getAbilities()) {
+                System.out.println(ability.getName());
+            }
+            System.out.println("________________________");
         } else if (giveUpButton.isPressed()){
             //todo ; lose screen
         } else if (toggleGrayscaleButton.isPressed()){
@@ -239,13 +358,16 @@ public class GameView implements Screen, InputProcessor {
         stage = new Stage(new ScreenViewport());
         timeRemaining.setPosition(Gdx.graphics.getWidth() - timeRemaining.getWidth() - 50, Gdx.graphics.getHeight() - timeRemaining.getHeight() - 40);
         remainingAmmo = new Label("Ammo : " + String.valueOf(App.getWeaponOfChoice().getRemainingAmmo()), labelStyle);
-        stage = new Stage(new ScreenViewport());
         remainingAmmo.setPosition(Gdx.graphics.getWidth() - remainingAmmo.getWidth() - 50, Gdx.graphics.getHeight() - remainingAmmo.getHeight() - 40);
         killCount = new Label("Kills : " + String.valueOf(App.getCurrentUser().getKills()) , labelStyle);
-        stage = new Stage(new ScreenViewport());
+
+        levelCount = new Label("Level : " + String.valueOf(controller.getPlayerController().getPlayer().getLevel()), labelStyle);
+
         killCount.setPosition(Gdx.graphics.getWidth() - killCount.getWidth() - 50, Gdx.graphics.getHeight() - killCount.getHeight() - 40);
         remainingAmmo.setPosition(timeRemaining.getX(), timeRemaining.getY() - timeRemaining.getHeight() - 40);
         killCount.setPosition(remainingAmmo.getX(), remainingAmmo.getY() - remainingAmmo.getHeight() - 40);
+        levelCount.setPosition(killCount.getX(), killCount.getY() - killCount.getHeight() - 40);
+        stage.addActor(levelCount);
         stage.addActor(remainingAmmo);
         stage.addActor(killCount);
         stage.addActor(timeRemaining);

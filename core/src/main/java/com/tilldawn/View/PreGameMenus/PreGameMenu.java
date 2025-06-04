@@ -232,11 +232,16 @@ public class PreGameMenu implements Screen {
         weaponList = new ArrayList<>();
         timeList = new ArrayList<>();
 
-        characterList.add(new Player("Shana", new Texture("Heroes/Shana2.png"), "Fast, high crit rate", 4, 4f, new Texture("Heroes/T_Shana_Portrait.png")));
-        characterList.add(new Player("Diamond", new Texture("Heroes/Diamond.png"), "Area control", 7, 1f, new Texture("Heroes/T_Diamond_Portrait.png")));
-        characterList.add(new Player("Scarlett", new Texture("Heroes/Scarlett.png"), "Fast, high crit rate", 3, 5f, new Texture("Heroes/T_Scarlett_Portrait.png")));
-        characterList.add(new Player("Lilith", new Texture("Heroes/Lilith.png"), "Area control", 5, 3f, new Texture("Heroes/T_Lilith_Portrait.png")));
-        characterList.add(new Player("Dasher", new Texture("Heroes/Dasher3.png"), "Area control", 2, 10f, new Texture("Heroes/T_Dasher_Portrait.png")));
+        characterList.add(new Player("Shana", new Texture("Heroes/Shana2.png"), "Fast, high crit rate",
+            4, 4f, new Texture("Heroes/T_Shana_Portrait.png") , AssetManager.getAssetManager().getShana_idle_frames() , AssetManager.getAssetManager().getShanaRun_frames()));
+        characterList.add(new Player("Diamond", new Texture("Heroes/Diamond.png"), "Area control",
+            7, 1f, new Texture("Heroes/T_Diamond_Portrait.png"),AssetManager.getAssetManager().getDiamond_idle_frames() , AssetManager.getAssetManager().getDiamondRun_frames()));
+        characterList.add(new Player("Scarlett", new Texture("Heroes/Scarlett.png"), "Fast, high crit rate",
+            3, 5f, new Texture("Heroes/T_Scarlett_Portrait.png"),AssetManager.getAssetManager().getScarlett_idle_frames() , AssetManager.getAssetManager().getScarlettRun_frames()));
+        characterList.add(new Player("Lilith", new Texture("Heroes/Lilith.png"), "Area control",
+            5, 3f, new Texture("Heroes/T_Lilith_Portrait.png"),AssetManager.getAssetManager().getLilith_idle_frames() , AssetManager.getAssetManager().getLilithRun_frames()));
+        characterList.add(new Player("Dasher", new Texture("Heroes/Dasher3.png"), "Area control",
+            2, 10f, new Texture("Heroes/T_Dasher_Portrait.png"),AssetManager.getAssetManager().getDasher_idle_frames() , AssetManager.getAssetManager().getDasherRun_frames()));
 
         weaponList.add(new Weapon("Revolver", new Texture("weapons/revolver.png"),AssetManager.getAssetManager().getSmgTexture() ,20, 1 , 6));
         weaponList.add(new Weapon("Shotgun", new Texture("weapons/shotgun.png"), AssetManager.getAssetManager().getSmgTexture(),10, 1 , 2));

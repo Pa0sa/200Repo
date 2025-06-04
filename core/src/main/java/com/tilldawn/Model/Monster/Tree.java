@@ -18,6 +18,7 @@ public class Tree {
     private int posY ;
     private Rectangle collisionRect ;
     private Rectangle collisionRect2 ;
+    private float time = 0;
 
     public Tree(int posX, int posY) {
         this.posX = posX;
@@ -31,7 +32,7 @@ public class Tree {
 
         // Scale visually (optional: setSize instead, based on image resolution)
         //treeSprite.setScale(3f); // OR: treeSprite.setSize(originalWidth * 3, originalHeight * 3);
-        treeSprite.setSize(treeSprite.getWidth()*3, treeSprite.getHeight()*3);
+        treeSprite.setSize(treeSprite.getWidth()*2, treeSprite.getHeight()*2);
         // Update collision rect to match scaled dimensions
 //        float scaledWidth = treeSprite.getWidth() * treeSprite.getScaleX();
 //        float scaledHeight = treeSprite.getHeight() * treeSprite.getScaleY();
@@ -80,24 +81,14 @@ public class Tree {
         return posX;
     }
 
-    public void initTrees(int count) {
-//        for (int i = 0; i < count; i++) {
-//            Vector2 pos;
-//            boolean overlaps;
-//            do {
-//                overlaps = false;
-//                pos = new Vector2(MathUtils.random(0, Gdx.graphics.getWidth() - 64),
-//                    MathUtils.random(0, Gdx.graphics.getHeight() - 64));
-//                for (Tree t : trees) {
-//                    if (t.getPosition().dst(pos) < t.getSize()) {
-//                        overlaps = true;
-//                        break;
-//                    }
-//                }
-//            } while (overlaps);
-//            trees.add(new Tree(pos));
-//        }
+    public float getTime() {
+        return time;
     }
+
+    public void setTime(float time) {
+        this.time = time;
+    }
+
 
 }
 

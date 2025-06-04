@@ -25,36 +25,62 @@ public class PlayerController {
     public PlayerController(Player player){
         this.player = player;
     }
+
     public void update(){
+        if (player.isHurt()) {
+            player.setHurtOverlayTime(player.getHurtOverlayTime() + Gdx.graphics.getDeltaTime());
+
+            Texture overlayFrame = player.getHurtAnimation()
+                .getKeyFrame(player.getHurtOverlayTime(), true); // don't loop
+
+            float x = player.getPlayerSprite().getX();
+            float y = player.getPlayerSprite().getY();
+            float width = player.getPlayerSprite().getWidth();
+            float height = player.getPlayerSprite().getHeight();
+
+            Main.getBatch().draw(overlayFrame, x, y, width, height);
+
+            if (player.getHurtOverlayTime() > player.getHURT_DURATION()) {
+                player.setHurt(false);
+                player.setHurtOverlayTime(0f);
+            }
+        }
         player.getPlayerSprite().draw(Main.getBatch());
         player.cooldown();
-        if(reload){
+        if (reload) {
             reload();
         }
-        if(player.isPlayerIdle()){
+        if (player.isPlayerIdle()) {
             idleAnimation();
+        } else {
+            runAnimation();
         }
-
         handlePlayerInput();
+
     }
 
     public void handlePlayerInput(){
+        player.setPlayerIdle(true);
         if (Gdx.input.isKeyPressed(wInt)){
             App.getHeroOfChoice().setPosY(MathUtils.clamp(player.getPosY() - player.getSpeed(),-4375,  0));
             App.getPlayerController().getPlayer().getRect().setPosition(960 - player.getPosX(),500 - MathUtils.clamp(player.getPosY() - player.getSpeed(),-4375,  0) + 10);
+            player.setPlayerIdle(false);
         }
         if (Gdx.input.isKeyPressed(dInt)){
             App.getHeroOfChoice().setPosX(MathUtils.clamp( player.getPosX() - player.getSpeed(),-5631,  0));
             App.getPlayerController().getPlayer().getRect().setPosition(960 -MathUtils.clamp( player.getPosX() - player.getSpeed(),-5631,  0) + 10 ,500 - player.getPosY());
+            player.setPlayerIdle(false);
         }
         if (Gdx.input.isKeyPressed(sInt)){
             App.getHeroOfChoice().setPosY(MathUtils.clamp(player.getPosY() + player.getSpeed(),-4375,  0));
             App.getPlayerController().getPlayer().getRect().setPosition(960 -player.getPosX(),500 -MathUtils.clamp(player.getPosY() + player.getSpeed(),-4375,  0) - 10);
+            player.setPlayerIdle(false);
         }
         if (Gdx.input.isKeyPressed(aInt)){
             App.getHeroOfChoice().setPosX(MathUtils.clamp( player.getPosX() + player.getSpeed(),-5631,  0));
             App.getPlayerController().getPlayer().getRect().setPosition(960 - MathUtils.clamp( player.getPosX() + player.getSpeed(),-5631,  0) - 10 ,500 - player.getPosY());
             player.getPlayerSprite().flip(true, false);
+            player.setPlayerIdle(false);
         }
         if (Gdx.input.isKeyPressed(rInt)){
             reload = true;
@@ -77,20 +103,26 @@ public class PlayerController {
 
     public void idleAnimation(){
         Animation<Texture> animation;
-        if(App.getHeroOfChoice().getName().equals("Diamond")){
-            animation = AssetManager.getAssetManager().getCharacter2_idle_animation();
-        } else {
-            animation = AssetManager.getAssetManager().getCharacter1_idle_animation();
-        }
+        animation = player.getIdleAnimation();
         player.getPlayerSprite().setRegion(animation.getKeyFrame(player.getTime()));
-
         if (!animation.isAnimationFinished(player.getTime())) {
             player.setTime(player.getTime() + Gdx.graphics.getDeltaTime());
         }
         else {
             player.setTime(0);
         }
-
+        animation.setPlayMode(Animation.PlayMode.LOOP);
+    }
+    public void runAnimation(){
+        Animation<Texture> animation;
+        animation = player.getRunAnimation();
+        player.getPlayerSprite().setRegion(animation.getKeyFrame(player.getTime()));
+        if (!animation.isAnimationFinished(player.getTime())) {
+            player.setTime(player.getTime() + Gdx.graphics.getDeltaTime());
+        }
+        else {
+            player.setTime(0);
+        }
         animation.setPlayMode(Animation.PlayMode.LOOP);
     }
 

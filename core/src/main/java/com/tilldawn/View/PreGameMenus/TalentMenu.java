@@ -12,27 +12,36 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.tilldawn.Control.MenuController.MainMenuController;
+import com.tilldawn.Model.AssetManager;
 
 import java.util.Map;
+
+import static com.tilldawn.Main.getMain;
 
 public class TalentMenu implements Screen {
     private Stage stage;
     private Skin skin;
     private Table table;
-
+    private Screen settingScreen;
     // داده‌های نمونه (در پروژه واقعی باید داده واقعی را بیاوری)
-    private String[] heroes = {"Hero1: Fast", "Hero2: Power", "Hero3: Defence"};
+    private String[] heroes = {"Diamond: Has a lot of Health", "Dasher: Fastest among the 5", "Lilith: Average Speed and Health"};
     private Map<String, Integer> currentKeyBindings; // از تنظیمات خوانده شود
     private Map<String, String> cheats = Map.of(
-        "IDDQD", "God Mode: God Mode",
-        "GIVEALL", "Getting All Weapons"
+        "O :", "Pass 1 minute",
+        "L :", "Level up",
+        "I :","Adds Health",
+        "P :","Goes to Boss Fight",
+        "K :", "Revives the Player after Death",
+        "Space :" , "Auto Aim"
     );
-    private String[] abilities = {"Fast Pace", "Multi Shot", "Accurate Shooting"};
+    private String[] abilities = {"Vitality : Adds 1 to Maximum Health", "Damager : Increase Damage by 25% for 10 seconds",
+        "ProCrease : Increase weapon projectiles by 1" , "AmoCrease : Increase weapon Max ammo by 1" , "Speedy : Doubles the player speed for 10 seconds" };
 
     public TalentMenu(Skin skin, Map<String, Integer> currentKeyBindings) {
         this.skin = skin;
         this.currentKeyBindings = currentKeyBindings;
-
+        this.settingScreen = new SettingsMenu();
         stage = new Stage(new ScreenViewport());
         table = new Table(skin);
         table.setFillParent(true);
@@ -43,7 +52,6 @@ public class TalentMenu implements Screen {
 
     private void createUI() {
         table.clear();
-
         // عنوان منو
         Label title = new Label("Hint Menu", skin, "title");
         table.add(title).colspan(2).center().pad(10);
@@ -60,14 +68,32 @@ public class TalentMenu implements Screen {
         // بخش کلیدهای بازی
         table.add(new Label("Current Key Bindings:", skin)).left().pad(5).colspan(2);
         table.row();
-        for (Map.Entry<String, Integer> entry : currentKeyBindings.entrySet()) {
-            String action = entry.getKey();
-            String keyName = Input.Keys.toString(entry.getValue());
-            table.add(new Label(action + ": ", skin)).left().padLeft(20);
-            table.add(new Label(keyName, skin)).left().padRight(20);
+        if(currentKeyBindings.isEmpty()) {
+            table.add(new Label("W" + ": ", skin)).left().padLeft(20);
+            table.add(new Label("Move Up", skin)).left().padRight(20);
             table.row();
-        }
+            table.add(new Label("S" + ": ", skin)).left().padLeft(20);
+            table.add(new Label("Move Down", skin)).left().padRight(20);
+            table.row();
+            table.add(new Label("D" + ": ", skin)).left().padLeft(20);
+            table.add(new Label("Move Right", skin)).left().padRight(20);
+            table.row();
+            table.add(new Label("A" + ": ", skin)).left().padLeft(20);
+            table.add(new Label("Move Left", skin)).left().padRight(20);
+            table.row();
+            table.add(new Label("R" + ": ", skin)).left().padLeft(20);
+            table.add(new Label("Reload", skin)).left().padRight(20);
+            table.row();
 
+        } else {
+            for (Map.Entry<String, Integer> entry : currentKeyBindings.entrySet()) {
+                String action = entry.getKey();
+                String keyName = Input.Keys.toString(entry.getValue());
+                table.add(new Label(action + ": ", skin)).left().padLeft(20);
+                table.add(new Label(keyName, skin)).left().padRight(20);
+                table.row();
+            }
+        }
         // بخش کدهای تقلب
         table.add(new Label("Cheat Codes:", skin)).left().pad(5).colspan(2);
         table.row();
@@ -90,8 +116,8 @@ public class TalentMenu implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // اینجا باید به منوی قبلی برگردی
-                // مثلا setScreen(mainMenu);
+                getMain().getScreen().dispose();
+                getMain().setScreen(new MainMenu( new MainMenuController(), AssetManager.getAssetManager().getSkin()));
             }
         });
         table.add(backButton).colspan(2).center().padTop(20);
@@ -104,7 +130,7 @@ public class TalentMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0, 1);
+        ScreenUtils.clear(0, 0, 0.1f, 1);
         stage.act(delta);
         stage.draw();
     }

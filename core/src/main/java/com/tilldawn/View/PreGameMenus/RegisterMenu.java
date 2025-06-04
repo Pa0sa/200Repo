@@ -58,9 +58,9 @@ public class RegisterMenu implements Screen {
 
         this.securityQuestion = new SelectBox<>(skin);
         Array<String> hero = new Array<>();
-        hero.add("What was your first car model?");
-        hero.add("What was your first pet's name?");
-        hero.add("Who is your favourite Avenger?");
+        hero.add("1. What was your first car model?");
+        hero.add("2. What was your first pet's name?");
+        hero.add("3. Who is your favourite Avenger?");
         securityQuestion.setItems(hero);
 
         this.userNameField = new TextField("", skin);

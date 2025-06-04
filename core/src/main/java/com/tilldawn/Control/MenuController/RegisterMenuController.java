@@ -20,7 +20,7 @@ public class RegisterMenuController {
         if (view != null) {
             if (view.getConfirmButton().isPressed() && !view.isShowPasswordError() && !view.isShowUsernameError()) {
                 int rand = (int)(Math.random() * 14) + 1;
-                String avatar = "avatars/ (" + rand + ").png";
+                String avatar = "avatars/(" + rand + ").png";
                 App.getUsers().add(new User(view.getUserNameField().getText(), view.getPasswordField().getText()
                     , avatar , view.getSecurityQuestion().getSelected().toString(), view.getSecurityQuestionField().getText() , 0 , 0 , 0));
 

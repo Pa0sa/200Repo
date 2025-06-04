@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tilldawn.Main;
+import com.tilldawn.Model.Ability;
 import com.tilldawn.Model.App;
 import com.tilldawn.Model.Bullet;
 import com.tilldawn.Model.Weapon;
@@ -12,6 +13,7 @@ import com.tilldawn.Model.Weapon;
 import java.util.ArrayList;
 
 import static com.tilldawn.Control.PlayerController.*;
+import static com.tilldawn.Model.App.getPlayerController;
 
 public class WeaponController {
     private Weapon weapon;
@@ -45,6 +47,20 @@ public class WeaponController {
             bullets.add(new Bullet(x - 20, y - 20));
         } else {
             bullets.add(new Bullet(x, y));
+            int k = 0;
+            int u = 0;
+            for(Ability ability : App.getPlayerController().getPlayer().getAbilities()){
+                if(ability.getName().equals("ProCrease")){
+                    k += 20;
+                    u += 1;
+                    if(u%2==0){
+                        bullets.add(new Bullet(x + k , y + k));
+                    }
+                    if(u%2==1){
+                        bullets.add(new Bullet(x - k , y + k));
+                    }
+                }
+            }
         }
             //weapon.setRemainingAmmo(weapon.getAmmo() - 1);
     }
@@ -59,16 +75,16 @@ public class WeaponController {
             ).nor();
 
             if (Gdx.input.isKeyPressed(wInt)){
-                b.getSprite().setY(b.getSprite().getY() - (App.getPlayerController().getPlayer().getSpeed())/4);
+                b.getSprite().setY(b.getSprite().getY() - (getPlayerController().getPlayer().getSpeed())/4);
             }
             if (Gdx.input.isKeyPressed(dInt)){
-                b.getSprite().setX(b.getSprite().getX() - (App.getPlayerController().getPlayer().getSpeed())/4);
+                b.getSprite().setX(b.getSprite().getX() - (getPlayerController().getPlayer().getSpeed())/4);
             }
             if (Gdx.input.isKeyPressed(sInt)){
-                b.getSprite().setY(b.getSprite().getY() + (App.getPlayerController().getPlayer().getSpeed())/4);
+                b.getSprite().setY(b.getSprite().getY() + (getPlayerController().getPlayer().getSpeed())/4);
             }
             if (Gdx.input.isKeyPressed(aInt)){
-                b.getSprite().setX(b.getSprite().getX() + (App.getPlayerController().getPlayer().getSpeed())/4);
+                b.getSprite().setX(b.getSprite().getX() + (getPlayerController().getPlayer().getSpeed())/4);
             }
             b.getSprite().setX(b.getSprite().getX() - direction.x * 5);
             b.getSprite().setY(b.getSprite().getY() + direction.y * 5);
@@ -82,5 +98,9 @@ public class WeaponController {
 
     public ArrayList<Bullet> getBullets() {
         return bullets;
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
     }
 }

@@ -25,6 +25,7 @@ public class ProfileMenu implements Screen {
     private TextButton changePasswordButton;
     private TextButton changeAvatarButton;
     private TextButton changeAvatarWindowButton;
+    private TextButton accountDeletionButton;
 
     private Label userNameTitle;
     private Label passwordTitle;
@@ -72,6 +73,7 @@ public class ProfileMenu implements Screen {
         this.changePasswordButton = new TextButton("Change Password", skin);
         this.changeAvatarButton = new TextButton("Change Avatar", skin);
         this.changeAvatarWindowButton = new TextButton("Select From Disk", skin);
+        this.accountDeletionButton = new TextButton("Delete Account", skin);
 
         this.userNameTitle = new Label("Enter Your Name", skin);
         this.passwordTitle = new Label("Enter Your Password", skin);
@@ -135,6 +137,11 @@ public class ProfileMenu implements Screen {
         changeAvatarWindowButton.setWidth(200);
         changeAvatarWindowButton.setHeight(passwordField.getHeight());
 
+        accountDeletionButton.setWidth(200);
+        accountDeletionButton.setHeight(accountDeletionButton.getHeight());
+        accountDeletionButton.setPosition((Gdx.graphics.getWidth() - accountDeletionButton.getWidth())/2
+            , 70);
+        stage.addActor(accountDeletionButton);
 
         avatarDragAndDrop.setPosition(userNameField.getX(),
             avatarField.getY() - passwordField.getHeight() - avatarTitle.getHeight() - 10);
@@ -283,5 +290,9 @@ public class ProfileMenu implements Screen {
 
     public TextField getAvatarField() {
         return avatarField;
+    }
+
+    public TextButton getAccountDeletionButton() {
+        return accountDeletionButton;
     }
 }

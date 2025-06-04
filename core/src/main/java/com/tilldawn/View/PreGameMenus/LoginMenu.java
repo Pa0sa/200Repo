@@ -11,7 +11,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tilldawn.Control.MenuController.LoginMenuController;
 import com.tilldawn.Main;
+import com.tilldawn.Model.App;
 import com.tilldawn.Model.AssetManager;
+import com.tilldawn.Model.User;
 
 public class LoginMenu implements Screen {
 
@@ -38,8 +40,15 @@ public class LoginMenu implements Screen {
     private TextField securityQuestionField;
     private Label resetPasswordTitle;
     private Label passwordError;
+    private Label wrongPasswordError;
+    private Label wrongUserNameError;
+
     boolean showPasswordError = false;
     boolean resetPasswordMenu = false;
+
+    boolean showUsernameError = true;
+
+    boolean showWrongPasswordError = false;
 
     private Texture logo = AssetManager.getAssetManager().getLogo();
     Image image = new Image(logo);
@@ -49,7 +58,7 @@ public class LoginMenu implements Screen {
         this.confirmButton = new TextButton("Confirm", skin);
         this.backButton = new TextButton("Back", skin);
         this.backButton2 = new TextButton("Back", skin);
-        this.forgotButton = new TextButton("Reset\nPassword?", skin);
+        this.forgotButton = new TextButton("Reset\nPassword", skin);
         this.submitButton = new TextButton("Submit", skin);
 
         this.userNameTitle = new Label("Enter Your Name", skin);
@@ -68,6 +77,8 @@ public class LoginMenu implements Screen {
         securityQuestion.setItems(hero);
         this.securityQuestionField = new TextField("", skin);
         this.passwordError = new Label("Invalid Password Format", skin);
+        this.wrongPasswordError = new Label("Password is Incorrect", skin);
+        this.wrongUserNameError = new Label("Username not Found", skin);
         this.controller = controller;
         controller.setView(this);
     }
@@ -119,6 +130,8 @@ public class LoginMenu implements Screen {
         submitButton.setWidth(200);
         submitButton.setPosition(userNameField.getX()+(userNameField.getWidth() - confirmButton.getWidth())/2, 100);
 
+        wrongUserNameError.setPosition(userNameField.getX() + userNameField.getWidth() - wrongUserNameError.getWidth() - 3, userNameField.getY() + 8);
+
         securityQuestionField.setWidth(700);
         securityQuestionField.setPosition(stage.getWidth() / 2 - securityQuestionField.getWidth()/2 ,
             passwordField.getY() - passwordField.getHeight() - securityQuestion.getHeight());
@@ -144,6 +157,7 @@ public class LoginMenu implements Screen {
         stage.draw();
         batch.setShader(null);
         check();
+        usernameCheck();
         controller.handleMainMenuButtons();
     }
 
@@ -222,6 +236,7 @@ public class LoginMenu implements Screen {
         forgotButton.remove();
         passwordTitle.remove();
         backButton.remove();
+        controller.getPasswordError().remove();
         stage.addActor(backButton2);
         stage.addActor(resetPasswordField);
         stage.addActor(submitButton);
@@ -259,5 +274,71 @@ public class LoginMenu implements Screen {
             }
         }
     }
+    public void usernameCheck() {
+        if(!resetPasswordMenu) {
+            showUsernameError = true;
+            for (User user : App.getUsers()) {
+                if (user.getUserName().equals(userNameField.getText())) {
+                    showUsernameError = false;
+                }
+            }
+        }
+        if(showUsernameError) {
+            stage.addActor(wrongUserNameError);
+        } else if (!showUsernameError){
+            wrongUserNameError.remove();
+        }
+    }
 
+    public Label getUserNameTitle() {
+        return userNameTitle;
+    }
+
+    public Label getPasswordTitle() {
+        return passwordTitle;
+    }
+
+    public LoginMenuController getController() {
+        return controller;
+    }
+
+    public Label getResetPasswordTitle() {
+        return resetPasswordTitle;
+    }
+
+    public Label getPasswordError() {
+        return passwordError;
+    }
+
+    public Label getWrongPasswordError() {
+        return wrongPasswordError;
+    }
+
+    public Label getWrongUserNameError() {
+        return wrongUserNameError;
+    }
+
+    public boolean isShowPasswordError() {
+        return showPasswordError;
+    }
+
+    public boolean isResetPasswordMenu() {
+        return resetPasswordMenu;
+    }
+
+    public boolean isShowUsernameError() {
+        return showUsernameError;
+    }
+
+    public boolean isShowWrongPasswordError() {
+        return showWrongPasswordError;
+    }
+
+    public Texture getLogo() {
+        return logo;
+    }
+
+    public Image getImage() {
+        return image;
+    }
 }

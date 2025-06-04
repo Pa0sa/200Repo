@@ -11,6 +11,7 @@ import com.tilldawn.View.PreGameMenus.PreProgram;
 import static com.tilldawn.Main.getMain;
 
 public class LoginMenuController {
+    Label passwordError = new Label("Wrong Password" , AssetManager.getAssetManager().getSkin());
 
     private LoginMenu view;
 
@@ -23,8 +24,7 @@ public class LoginMenuController {
 
             if (view.getConfirmButton().isPressed()) {
 
-                Label passwordError = new Label("HE HE" , AssetManager.getAssetManager().getSkin());
-                passwordError.setPosition(100, 100);
+                passwordError.setPosition(view.getPasswordField().getX() + view.getPasswordField().getWidth() - passwordError.getWidth() - 3, view.getPasswordField().getY() + 8);
                 //Texture avatar = new Texture("avatar.png");
 
                 for(User user: App.getUsers()) {
@@ -49,8 +49,6 @@ public class LoginMenuController {
                             if(view.getResetPasswordField().getText().matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%&*()_]).{8,}$")) {
                                 user.setPassword(view.getResetPasswordField().getText());
                                 view.changeStageNormal();
-                            } else {
-
                             }
                         }
                     }
@@ -65,5 +63,10 @@ public class LoginMenuController {
             }
 
         }
+
+    }
+
+    public Label getPasswordError() {
+        return passwordError;
     }
 }

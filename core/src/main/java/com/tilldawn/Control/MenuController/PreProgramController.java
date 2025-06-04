@@ -34,7 +34,7 @@ public class PreProgramController {
             else if (view.getSkipButton().isPressed()) {
                 int rand  = (int) (Math.random() * 14) + 1;
 
-                User user = new User("Guest" , " " ,"avatars/ (" + rand +").png" , " " , " " , 0 , 0 , 0);
+                User user = new User("Guest" , " " ,"avatars/(" + rand +").png" , " " , " " , 0 , 0 , 0);
                 App.setCurrentUser(user);
                 getMain().getScreen().dispose();
                 getMain().setScreen(new MainMenu( new MainMenuController(),AssetManager.getAssetManager().getSkin()));
