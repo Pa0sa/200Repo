@@ -2,8 +2,10 @@ package com.tilldawn.Model.Monster;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.tilldawn.Model.AssetManager;
@@ -19,9 +21,16 @@ public class Eyebat {
     private int health;
     private Rectangle collisionRect ;
     private Rectangle collisionRect2 ;
-
+    private float time = 0;
     private float cooldownCounter = 0 ;
     private float cooldownPassed = 0 ;
+
+    private boolean dying = false;
+    private float deathTimer = 0f;
+    private static final float DEATH_DURATION = 0.5f; // seconds for animation
+    private Animation<Texture> deathAnimation;
+    private TextureRegion currentFrame; // for drawing
+
 
     public Eyebat(int posX, int posY) {
 
@@ -32,11 +41,12 @@ public class Eyebat {
         this.health = 50;
 
         tentacleTexture = new Texture(AssetManager.getAssetManager().getEyebat()); // Make sure this is loaded
+        deathAnimation = AssetManager.getAssetManager().getEyeBatDeath_frames();
         tentacle = new Sprite(tentacleTexture);
 
         // Set position first
         tentacle.setPosition(posX, posY);
-        tentacle.setSize(tentacle.getWidth()*3, tentacle.getHeight()*3);
+        tentacle.setSize(tentacle.getWidth()*2, tentacle.getHeight()*2);
 
 
         // Update collision rect to match scaled dimensions
@@ -56,6 +66,29 @@ public class Eyebat {
                 cooldownPassed += 1;
             }
         }
+    }
+
+    public boolean isDying() { return dying; }
+    public void setDying(boolean dying) {
+        this.dying = dying;
+        this.deathTimer = 0f;
+    }
+
+
+    public void updateDeathTimer(float delta) {
+        deathTimer += delta;
+    }
+
+    public float getDeathTimer() {
+        return deathTimer;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public Animation<Texture> getDeathAnimation() {
+        return deathAnimation;
     }
 
     public Rectangle getCollisionRect2() {
@@ -120,6 +153,14 @@ public class Eyebat {
 
     public void setCollisionRect(Rectangle collisionRect) {
         this.collisionRect = collisionRect;
+    }
+
+    public float getTime() {
+        return time;
+    }
+
+    public void setTime(float time) {
+        this.time = time;
     }
 }
 
