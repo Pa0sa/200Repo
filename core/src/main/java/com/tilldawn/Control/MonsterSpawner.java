@@ -368,10 +368,11 @@ public class MonsterSpawner {
             }
         }
     }
-
+    private boolean bossfight = false;
     public void updateElder() {
-        if(elderBoss == null && App.getTimeOfChoice()/2 < App.getTimePassed()){
+        if(!bossfight && App.getTimeOfChoice()/2 < App.getTimePassed() && elderBoss == null){
             elderBoss = new ElderBoss(0 , 0);
+            bossfight = true;
         }
         if(elderBoss != null) {
                 float playerX = App.getPlayerController().getPlayer().getPosX();
